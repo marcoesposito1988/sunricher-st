@@ -73,10 +73,12 @@ sunricher-st/
 smartthings edge:drivers:package .
 ```
 
-### Step 2: Create / Select a Driver Channel (if not already done)
+### Step 2: Create a Driver Channel (if not already done)
+Run without positional arguments to create a channel interactively:
 ```bash
-smartthings edge:channels:create "My Edge Drivers"
+smartthings edge:channels:create
 ```
+*(You will be prompted to enter the channel Name, Description, and Terms of Service)*
 
 ### Step 3: Assign the Driver to Your Channel
 ```bash
@@ -85,8 +87,13 @@ smartthings edge:channels:assign <DRIVER_ID> --channel <CHANNEL_ID>
 
 ### Step 4: Install the Driver to Your SmartThings Hub
 ```bash
-smartthings edge:drivers:install --channel <CHANNEL_ID> --hub <HUB_ID>
+smartthings edge:drivers:install <DRIVER_ID> --channel <CHANNEL_ID> --hub <HUB_ID>
 ```
+
+> **Tip:** You can also package, assign, and install in a single step:
+> ```bash
+> smartthings edge:drivers:package --channel <CHANNEL_ID> --hub <HUB_ID>
+> ```
 
 ### Step 5: Pair the Sunricher SR-ZG2856-PRO
 1. In the SmartThings mobile app, tap **+** -> **Add device** -> **Scan for nearby devices**.
