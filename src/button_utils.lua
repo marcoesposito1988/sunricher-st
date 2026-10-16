@@ -144,9 +144,14 @@ button_utils.emit_button_event = function(device, button_number, action)
 end
 
 --- Initialize all button capability states and supported button values for all components.
+--- Also initializes default battery state if not already set, avoiding offline/uninitialized state in UI.
 ---
 --- @param device ZigbeeDevice The SmartThings device instance
 button_utils.initialize_button_components = function(device)
+  if type(device.online) == "function" then
+    pcall(function() device:online() end)
+  end
+
   local supp_values = button_utils.SUPPORTED_BUTTON_VALUES
 
   for comp_id, comp in pairs(device.profile.components) do
@@ -164,9 +169,19 @@ button_utils.initialize_button_components = function(device)
       capabilities.button.numberOfButtons({ value = num_buttons }, { visibility = { displayed = false } })
     )
 
-    -- Initialize state without triggering automations
+    -- Initialize button state without triggering automations
     local initial_event = capabilities.button.button.pushed({ state_change = false })
     device:emit_component_event(comp, initial_event)
+  end
+
+  -- Initialize battery state if missing so device isn't marked uninitialized/offline
+  if type(device.get_latest_state) == "function" then
+    local current_battery = device:get_latest_state("main", capabilities.battery.ID, capabilities.battery.battery.NAME)
+    if current_battery == nil then
+      device:emit_event(capabilities.battery.battery(100))
+    end
+  else
+    device:emit_event(capabilities.battery.battery(100))
   end
 end
 

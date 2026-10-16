@@ -34,6 +34,14 @@ local SUNRICHER_PRESS_COMMAND_ID = 0x01
 --- @param device ZigbeeDevice The device that generated the message
 --- @param zb_rx ZigbeeMessageRx The full Zigbee message
 local function sunricher_press_handler(driver, device, zb_rx)
+  -- Ensure battery state is populated if it was never received
+  if type(device.get_latest_state) == "function" then
+    local current_battery = device:get_latest_state("main", capabilities.battery.ID, capabilities.battery.battery.NAME)
+    if current_battery == nil then
+      device:emit_event(capabilities.battery.battery(100))
+    end
+  end
+
   local zcl_body = (zb_rx.body and zb_rx.body.zcl_body) or zb_rx.body
   local action, buttons = button_utils.parse_sunricher_press(zcl_body)
 
@@ -78,16 +86,6 @@ local function battery_voltage_handler(driver, device, value, zb_rx)
   log.info(string.format("Battery voltage reported: %.1fV -> %d%%", raw_voltage / 10.0, percentage))
 end
 
---- Capability Command Handler: Refresh
----
---- @param driver Driver
---- @param device ZigbeeDevice
---- @param command table
-local function refresh_handler(driver, device, command)
-  log.info("Refreshing Sunricher SR-ZG2856-PRO state...")
-  device:send(PowerConfiguration.attributes.BatteryPercentageRemaining:read(device))
-end
-
 --- Lifecycle Handler: added
 ---
 --- @param driver Driver
@@ -96,6 +94,7 @@ local function device_added(driver, device)
   log.info("Sunricher SR-ZG2856-PRO added to hub")
   button_utils.initialize_button_components(device)
   device:send(PowerConfiguration.attributes.BatteryPercentageRemaining:read(device))
+  device:send(PowerConfiguration.attributes.BatteryVoltage:read(device))
 end
 
 --- Lifecycle Handler: init
@@ -104,6 +103,9 @@ end
 --- @param device ZigbeeDevice
 local function device_init(driver, device)
   log.info("Sunricher SR-ZG2856-PRO initialized")
+  button_utils.initialize_button_components(device)
+  device:send(PowerConfiguration.attributes.BatteryPercentageRemaining:read(device))
+  device:send(PowerConfiguration.attributes.BatteryVoltage:read(device))
 end
 
 --- Lifecycle Handler: doConfigure
@@ -112,19 +114,26 @@ end
 --- @param device ZigbeeDevice
 local function device_doconfigure(driver, device)
   log.info("Configuring Sunricher SR-ZG2856-PRO bindings and reporting...")
+
+  -- Run framework default configuration
+  device:configure()
+
   local hub_eui = driver.environment_info.hub_zigbee_eui
   local ep = 1
 
   -- 1. Bind Battery / Power Configuration cluster and configure reporting
   device:send(device_management.build_bind_request(device, PowerConfiguration.ID, hub_eui, ep))
   device:send(PowerConfiguration.attributes.BatteryPercentageRemaining:configure_reporting(device, 30, 21600, 1))
+  device:send(PowerConfiguration.attributes.BatteryVoltage:configure_reporting(device, 30, 21600, 1))
 
   -- 2. Bind Sunricher custom remote cluster 0xFF03
   device:send(device_management.build_bind_request(device, SUNRICHER_REMOTE_CLUSTER_ID, hub_eui, ep))
 
-  -- 3. Read initial battery status
+  -- 3. Read initial states
   device:send(PowerConfiguration.attributes.BatteryPercentageRemaining:read(device))
+  device:send(PowerConfiguration.attributes.BatteryVoltage:read(device))
 
+  button_utils.initialize_button_components(device)
   log.info("Sunricher SR-ZG2856-PRO configuration complete")
 end
 
@@ -148,8 +157,6 @@ local sunricher_driver_template = {
   supported_capabilities = {
     capabilities.button,
     capabilities.battery,
-    capabilities.refresh,
-    capabilities.firmwareUpdate,
   },
   zigbee_handlers = {
     cluster = {
@@ -165,15 +172,13 @@ local sunricher_driver_template = {
     },
     fallback = fallback_message_handler,
   },
-  capability_handlers = {
-    [capabilities.refresh.ID] = {
-      [capabilities.refresh.commands.refresh.NAME] = refresh_handler,
-    }
-  },
+  capability_handlers = {},
   lifecycle_handlers = {
     init = device_init,
     added = device_added,
     doConfigure = device_doconfigure,
+    driverSwitched = device_doconfigure,
+    infoChanged = device_init,
   },
   ias_zone_configuration_method = nil,
   health_check = false,

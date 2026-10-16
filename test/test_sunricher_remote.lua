@@ -182,6 +182,7 @@ end
 -- Test 9: Device Component Initialization & Event Emission
 do
   local emitted_events = {}
+  local online_called = false
   local mock_device = {
     profile = {
       components = {
@@ -198,6 +199,9 @@ do
         button10 = { id = "button10" },
       }
     },
+    online = function(self)
+      online_called = true
+    end,
     emit_component_event = function(self, comp, event)
       table.insert(emitted_events, { comp = comp.id, event = event })
     end,
@@ -207,7 +211,8 @@ do
   }
 
   button_utils.initialize_button_components(mock_device)
-  assert_eq(#emitted_events, 33, "11 components * 3 events each = 33 events on init")
+  assert_eq(online_called, true, "device:online() should be called during initialization")
+  assert_eq(#emitted_events, 34, "11 components * 3 events each + 1 initial battery event = 34 events on init")
 
   -- Now test emitting a button event
   emitted_events = {}
