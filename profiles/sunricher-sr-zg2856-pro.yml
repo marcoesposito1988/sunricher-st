@@ -1,0 +1,85 @@
+name: sunricher-sr-zg2856-pro
+components:
+  - id: main
+    label: "Main"
+    capabilities:
+      - id: button
+        version: 1
+      - id: battery
+        version: 1
+      - id: firmwareUpdate
+        version: 1
+      - id: refresh
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button1
+    label: "Button 1 (K1)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button2
+    label: "Button 2 (K2)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button3
+    label: "Button 3 (K3)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button4
+    label: "Button 4 (K4)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button5
+    label: "Button 5 (K5)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button6
+    label: "Button 6 (K6)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button7
+    label: "Button 7 (K7)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button8
+    label: "Button 8 (K8)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button9
+    label: "Button 9 (K9)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController
+  - id: button10
+    label: "Button 10 (K10)"
+    capabilities:
+      - id: button
+        version: 1
+    categories:
+      - name: RemoteController

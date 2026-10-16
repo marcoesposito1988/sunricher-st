@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ClojureProjectResolveSettings">
+    <currentScheme>IDE</currentScheme>
+  </component>
+  <component name="JuliaProjectSettings">
+    <option name="basePath" value="/usr/share/julia/base" />
+    <option name="exePath" value="/usr/bin/julia" />
+    <option name="version" value="1.1.0" />
+  </component>
+  <component name="ProjectRootManager" version="2">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>

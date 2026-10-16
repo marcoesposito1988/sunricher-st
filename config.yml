@@ -1,0 +1,4 @@
+name: "Sunricher SR-ZG2856-PRO"
+packageKey: "sunricher-sr-zg2856-pro"
+permissions:
+  zigbee: {}

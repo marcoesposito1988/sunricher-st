@@ -1,0 +1,27 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# IDE and Editor Files
+.idea/
+*.iml
+.vscode/
+
+# Build, Package, and Distribution Artifacts
+build/
+dist/
+package/
+*.zip
+*.tar.gz
+
+# Logs and Runtime Artifacts
+*.log
+luac.out
+*.luac
+
+# Environment and Secret Configurations
+.env
+.env.*
+*.st_config
